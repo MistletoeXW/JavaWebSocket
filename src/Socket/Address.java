@@ -1,7 +1,7 @@
 package Socket;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.net.*;
+import java.util.Enumeration;
 
 /*
  * @program: WebScoket
@@ -12,16 +12,29 @@ import java.net.UnknownHostException;
 public class Address {
 
     public static void main(String[] args){
-        InetAddress ip;
-        try{
-            ip = InetAddress.getLocalHost();  //实例化对象
-            String localname = ip.getHostName(); //获取本机名
-            String locaip = ip.getHostAddress(); //获取本机ip地址
-            System.out.print("本机名：" + localname+'\n');
-            System.out.print("本机ip地址："+locaip);
-        }catch (UnknownHostException e){
-            e.printStackTrace();  //在主机不存在网络连接或者连结错误时抛出异常
+        System.out.print(getInet4Address());
+    }
 
+    public static String getInet4Address() {
+        Enumeration<NetworkInterface> nis;
+        String ip = null;
+        try {
+            nis = NetworkInterface.getNetworkInterfaces();
+            for (; nis.hasMoreElements();) {
+                NetworkInterface ni = nis.nextElement();
+                Enumeration<InetAddress> ias = ni.getInetAddresses();
+                for (; ias.hasMoreElements();) {
+                    InetAddress ia = ias.nextElement();
+                    //ia instanceof Inet6Address && !ia.equals("")
+                    if (ia instanceof Inet4Address && !ia.getHostAddress().equals("127.0.0.1")) {
+                        ip = ia.getHostAddress();
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
+        return ip;
     }
 }
